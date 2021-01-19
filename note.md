@@ -79,3 +79,36 @@
     // 现在，可以用模板字面量这样实现：
     let interpolatedTemplateLiteral = `${ value } to the ${ exponent } power is ${ value * value }`;
 ```
+
++ String.raw() 可以直接获取原始的模板字面量内容
+
+```javascript
+    console.log(`\u00A9`);            // ©
+    console.log(String.raw`\u00A9`);  // \u00A9
+    console.log(String.raw`first line\nsecond line`); //"first line\nsecond line" 只能转\n，不能转实际换行
+```
+
++ Symbol() 符号是原始值，且符号实例是唯一、不可变的。
+
+```javascript
+    let genericSymbol = Symbol();
+    let otherGenericSymbol = Symbol();
+
+    let fooSymbol = Symbol('foo');
+    let otherFooSymbol = Symbol('foo');
+
+    console.log(genericSymbol == otherGenericSymbol);  // false
+    console.log(fooSymbol == otherFooSymbol);          // false
+```
+
++ Symbol.for() 对每个字符串键都执行幂等操作。
+
+```javascript
+    let fooGlobalSymbol = Symbol.for('foo');       // 创建新符号
+    let otherFooGlobalSymbol = Symbol.for('foo');  // 重用已有符号
+
+    console.log(fooGlobalSymbol === otherFooGlobalSymbol);  // true
+```
+
++ 逻辑与操作符（&&）可用于任何类型的操作数，不限于布尔值。如果有操作数不是布尔值，**则逻辑与并不一定会返回布尔值**，而是遵循如下规则；如果第一个操作数是对象，则返回第二个操作数；如果第二个操作数是对象，则只有第一个操作数求值为true 才会返回该对象；如果两个操作数都是对象，则返回第二个操作数；如果有一个操作数是null ，则返回null；如果有一个操作数是NaN，则返回NaN；如果有一个操作数是undefined ，则返回undefined。
++ 逻辑或操作符（||），**如果有一个操作数不是布尔值，那么逻辑或操作符也不一定返回布尔值**。它遵循如下规则。如果第一个操作数是对象，则返回第一个操作数。如果第一个操作数求值为false ，则返回第二个操作数。如果两个操作数都是对象，则返回第一个操作数。如果两个操作数都是null ，则返回null 。如果两个操作数都是NaN ，则返回NaN 。如果两个操作数都是undefined ，则返回undefined 。
