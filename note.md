@@ -112,3 +112,32 @@
 
 + 逻辑与操作符（&&）可用于任何类型的操作数，不限于布尔值。如果有操作数不是布尔值，**则逻辑与并不一定会返回布尔值**，而是遵循如下规则；如果第一个操作数是对象，则返回第二个操作数；如果第二个操作数是对象，则只有第一个操作数求值为true 才会返回该对象；如果两个操作数都是对象，则返回第二个操作数；如果有一个操作数是null ，则返回null；如果有一个操作数是NaN，则返回NaN；如果有一个操作数是undefined ，则返回undefined。
 + 逻辑或操作符（||），**如果有一个操作数不是布尔值，那么逻辑或操作符也不一定返回布尔值**。它遵循如下规则。如果第一个操作数是对象，则返回第一个操作数。如果第一个操作数求值为false ，则返回第二个操作数。如果两个操作数都是对象，则返回第一个操作数。如果两个操作数都是null ，则返回null 。如果两个操作数都是NaN ，则返回NaN 。如果两个操作数都是undefined ，则返回undefined 。
++ 原始值指的是**原始类型**的值，也叫 基本类型，例如 Number、Stirng、Boolean、Null、Underfined。引用值指的是**引用类型**的值，例如 Object、Function、Array、Date、RegExp 。类似Python可变变量与不可变变量。
++ 原始类型的初始化可以只使用原始字面量形式。如果使用的是new 关键字，则JavaScript会创建一个Object 类型的实例，但其行为**类似**原始值。下面来看看这两种初始化方式的差异：
+
+```javascript
+    let name1 = "Nicholas";
+    let name2 = new String("Matt");
+    name1.age = 27;
+    name2.age = 26;
+    console.log(name1.age);    // undefined
+    console.log(name2.age);    // 26
+    console.log(typeof name1); // string
+    console.log(typeof name2); // object
+```
+
++ **ECMAScript中所有函数的参数都是按值传递的。**
++ **ECMAScript中所有函数的参数都是按值传递的。**
++ **ECMAScript中所有函数的参数都是按值传递的。**
+
+```javascript
+    function setName(obj) {
+    obj.name = "Nicholas";  // obj与 person是同一个地址值，指向同一个地址，影响不到 person
+    obj = new Object(); // obj地址值改变，影响不到 person
+    obj.name = "Greg";
+    }
+
+    let person = new Object();
+    setName(person); // 把 person的地址值传给 obj
+    console.log(person.name);  // "Nicholas"
+```
