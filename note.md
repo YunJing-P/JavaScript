@@ -160,3 +160,40 @@
 + 隐藏类和删除操作 - 以后再过一下
 + 内存泄漏 - 以后再过一下
 + RegExp 正则先跳过
++ eval()函数先放放，可以解析内部脚本
++ ECMA-262没有规定直接访问Global 对象的方式，但浏览器将window 对象实现为Global 对象的代理。因此，所有全局作用域中声明的变量和函数都变成了window 的属性。不过window 对象在JavaScript中远不止实现了ECMAScript 的Global 对象那么简单。
++ 这段代码创建一个立即调用的函数表达式，返回了this 的值。如前所述，当一个函数在没有明确（通过成为某个对象的方法，或者通过call() /apply() ）指定this 值的情况下执行时，this 值等于Global 对象。因此，调用一个简单返回this 的函数是在任何执行上下文中获取Global 对象的通用方式。
+  
+```javascript
+    let global = function() {
+        return this;    
+    }();
+```
+
++ min() 和max() 方法用于确定一组数值中的最小值和最大值。
+  
+```javascript
+    let max = Math.max(3, 54, 32, 16);
+    console.log(max);  // 54
+
+    let values = [1, 2, 3, 4, 5, 6, 7, 8];
+    let max = Math.max(...val); // 8
+```
+
++ Math.ceil() 方法始终向上舍入为最接近的整数。
++ Math.floor() 方法始终向下舍入为最接近的整数。
++ Math.round() 方法执行四舍五入。
++ Math.fround() 方法返回数值最接近的单精度（32位）浮点值表示。
++ 显式地创建Object 的实例有两种方式。第一种是使用new 操作符和Object 构造函数；另一种是用对象字面量。
+
+```javascript
+    let person = new Object();
+    person.name = "Nicholas";
+    person.age = 29;
+    // 全等 下面使用对象字面量
+    let person = {
+        name: "Nicholas",
+        age: 29
+    };
+```
+  
