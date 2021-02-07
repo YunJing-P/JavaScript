@@ -58,7 +58,7 @@
 
 ## 数据类型
 
-### Undefined
+### Undefined 类型
 
 + `undefined` 与**未声明** 有区别
 
@@ -69,7 +69,7 @@
     console.log(age)    // 报错
 ```
 
-### Null
+### Null 类型
 
 + Null 类型同样只有一个值，即特殊值null 。逻辑上讲，null 值表示一个空对象指针。
 
@@ -78,8 +78,9 @@
     console.log(typeof car);  // "object"
 ```
 
-### Boolean
+### Boolean 类型
 
++ 只有`true/false`
 + `Boolean()` 转型函数可以在任意类型的数据上调用，而且始终返回一个布尔值。
 
 数据类型|转换为true 的值|转换为false 的值
@@ -90,9 +91,15 @@ Number|非零数值（包括无穷值）|0 、NaN
 Object|任意对象|null
 Undefined|N/A （不存在）|undefined
 
-### Number
+### Number 类型
 
-+ **不要直接进行小数运算** ，因为使用了IEEE 754数值，存在这种舍入错误；因此永远不要测试某个特定的浮点值。小数运算可以`(num1*1000 + num2*1000)/1000`
++ **不要直接进行小数运算** ，因为使用了IEEE 754数值，存在这种舍入错误；因此**永远不要测试某个特定的浮点值**。小数运算可以`(num1*1000 + num2*1000)/1000`
+
+```javascript
+    console.log(0.1 + 0.2)    // 0.30000000000000004
+```
+
++ 如果某个计算得到的数值结果超出了JavaScript可以表示的范围，那么这个数值会被自动转换为一个特殊的`Infinity` （无穷）值。任何无法表示的负数以`-Infinity` （负无穷大）表示，任何无法表示的正数以`Infinity` （正无穷大）表示。
 + `NaN` 表示 **不是数值（Not a Number）**
 
 #### Number()
@@ -127,22 +134,82 @@ undefined|NaN
     console.log(Number("Hello -5") )    // NaN
 ```
 
-+ parseInt() 函数转换，从第一个非空格字符开始转换。如果第一个字符不是数值字符、加号或减号，parseInt() 立即返回NaN 。忽略小数点和字符串。第二个参数指定进制，建议始终传给它第二个参数。
+#### parseInt()
+
++ `parseInt("")` 为 `NaN`，`Number("")` 为0
++ 通常在需要得到**整数** 时可以**优先使用** `parseInt()` 函数。
++ `parseInt()` 函数转换，从第一个**非空格字符**开始转换。如果第一个字符**不是** 数值字符、加号或减号，`parseInt()` **立即返回** `NaN` 。忽略小数点和字符串。第二个参数指定进制，**建议始终传给它第二个参数。**
 
 ```javascript
-    parseInt(' 0x11.2and2')    // 17
-    parseInt(' 11.2and2', 16)   // 17，指定16可以省了'0x'
+    console.log(parseInt("1234blue"));  // 1234
+    console.log(parseInt(""));          // NaN
+    console.log(parseInt("0xA"));       // 10，解释为十六进制整数
+    console.log(parseInt(22.5));        // 22 无视小数点
+    console.log(parseInt("70"));        // 70，解释为十进制值
+    console.log(parseInt("0xf"));       // 15，解释为十六进制整数
+    console.log(parseInt(' 0x11.2and2'))    // 17
+    console.log(parseInt(' 11.2and2', 16))   // 17，指定16可以省了'0x'
 ```
 
-+ parseFloat() 函数的工作方式跟parseInt() 函数类似，它也是解析到字符串末尾或者解析到一个无效的浮点数值字符为止。只解析十进制值，因此不能指定底数。
+#### parseFloat()
+
++ `parseFloat()` 函数的工作方式跟`parseInt()` 函数类似，它也是解析到字符串末尾或者解析到一个无效的浮点数值字符为止。**只解析十进制值，因此不能指定底数。**
++ 如果字符串表示整数（没有小数点或者小数点后面只有一个零），则`parseFloat()` 返回整数。
 
 ```javascript
-    parseFloat("22.34.5")   // 22.34
-    parseFloat("1234blue")    // 1234，按整数解析
+    console.log(parseFloat("22.34.5"))   // 22.34
+    console.log(parseFloat("1234.0blue"))    // 1234，按整数解析
 ```
 
-+ 转换为字符串:toString() 方法可见于数值、布尔值、对象和字符串值（字符串副本）。null 和undefined 值没有toString() 方法。数值类型接受进制参数；String() 函数：如果值有toString() 方法，则调用该方法（不传参数）并返回结果。如果值是null ，返回"null" 。如果值是undefined ，返回"undefined" 。
-+ 模板字面量，模板字面量会保持反引号内部的空格，因此在使用时要格外注意。格式正确的模板字符串可能会看起来缩进不当。
+### String 类型
+
++ 字符串可以使用双引号（"）、单引号（'）或反引号（\`）标示
+
+```javascript
+    let hi
+    hi = "hi"
+    hi = 'hi'
+    hi = `hi`
+```
+
+#### toString()
+
++ 转换为字符串：`toString()` 方法可见于数值、布尔值、对象和字符串值（字符串副本）。
+
+```javascript
+    let age = 11;
+    console.log(age.toString());      // 字符串"11"
+
+    let found = true;
+    console.log(found.toString());  // 字符串"true"
+
+    let foo = {}
+    console.log(foo.toString());  // 字符串"[object Object]"
+    
+    foo.toString = function(){
+        return "Hi"
+    }
+    console.log(foo.toString());  // 字符串"Hi"
+
+```
+
++ `null` 和`undefined` 值**没有**`toString()` 方法。
++ 数值类型接受进制参数；
+
+```javascript
+    let num = 10;
+    console.log(num.toString());     // "10"
+    console.log(num.toString(2));    // "1010"
+    console.log(num.toString(16));   // "a"
+```
+
+#### String()
+
++ `String()` 函数：如果值有`toString()` 方法，则**调用该方法**（不传参数）并返回结果。如果值是`null` ，返回`"null"` 。如果值是`undefined` ，返回"`undefined"` 。
+
+#### 模板字面量
+
++ 模板字面量，模板字面量会**保持** 反引号内部的空格，因此在使用时要格外注意。**格式正确的模板字符串可能会看起来缩进不当**。
 
 ```javascript
     // 这个模板字面量在换行符之后有25个空格符
@@ -162,7 +229,11 @@ undefined|NaN
     console.log(thirdTemplateLiteral);
     // first line
     // second line
+```
 
++ 模板字面量最常用的一个特性是支持**字符串插值** ，也就是可以在一个连续定义中插入一个或多个值。
+
+```javascript
     let value = 5;
     let exponent = 'second';
     // 以前，字符串插值是这样实现的：
@@ -170,6 +241,17 @@ undefined|NaN
 
     // 现在，可以用模板字面量这样实现：
     let interpolatedTemplateLiteral = `${ value } to the ${ exponent } power is ${ value * value }`;
+```
+
++ 所有插入的值都会使用`toString()` **强制转型为字符串**，而且任何JavaScript表达式都可以用于插值。嵌套的模板字符串无须转义：
+
+```javascript
+    console.log(`Hello, ${ `World` }!`);  // Hello, World!
+
+    let foo = { 
+        toString: () => 'World'
+    };
+    console.log(`Hello, ${ foo }!`);      // Hello, World!
 ```
 
 + String.raw() 可以直接获取原始的模板字面量内容
