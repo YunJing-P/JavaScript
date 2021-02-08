@@ -1,6 +1,10 @@
 # JavaScript 高级程序设计（第四版） 笔记
 
+[toc]
+
 ## 变量
+
+[目录](#javascript-高级程序设计第四版-笔记)
 
 ### let & var
 
@@ -57,6 +61,8 @@
 ```
 
 ## 数据类型
+
+[目录](#javascript-高级程序设计第四版-笔记)
 
 ### Undefined 类型
 
@@ -400,6 +406,8 @@ undefined|NaN
 
 ## 操作符
 
+[目录](#javascript-高级程序设计第四版-笔记)
+
 ### 一元操作符
 
 + ~
@@ -529,35 +537,35 @@ undefined|undefined|undefined
     console.log(result);  // 会执行
 ```
 
-#### 乘性操作符 `*`
+### 乘性操作符 `*`
 
 + 如果`乘性操作符`有**不是数值**的操作数，则该操作数会在后台被使用`Number()` （[转换规则](#Number)）转型函数转换为数值。这意味着空字符串会被当成`0``，而布尔值true` 会被当成`1`。
 + 如果操作数都是**数值**，则执行常规的乘法运算，即两个正值相乘是正值，两个负值相乘也是正值，正负符号不同的值相乘得到负值。如果ECMAScript不能表示乘积，则返回`Infinity` 或`-Infinity` 。
 
 ```javascript
-    2*NaN // NaN
-    Infinity*0 // NaN
-    Infinity*2 //Infinity
-    Infinity*-2 // -Infinity
+    2*NaN             // NaN
+    Infinity*0        // NaN
+    Infinity*2        //Infinity
+    Infinity*-2       // -Infinity
     Infinity*Infinity //Infinity
 ```
 
-#### 除性操作符 `/`
+### 除性操作符 `/`
 
 + 如果操作数**都是数值**，则执行常规的除法运算，即两个正值相除是正值，两个负值相除也是正值，符号不同的值相除得到负值。如果ECMAScript不能表示商，则返回`Infinity` 或`-Infinity` 。
 
 ```javascript
-    2/NaN // NaN
-    NaN/2 // NaN
+    2/NaN             // NaN
+    NaN/2             // NaN
     Infinity/Infinity // NaN
-    0/0 // NaN
-    2/0 // Infinity
-    -2/0 // -Infinity
-    Infinity/2 // Infinity
-    Infinity/-2 // -Infinity
+    0/0               // NaN
+    2/0               // Infinity
+    -2/0              // -Infinity
+    Infinity/2        // Infinity
+    Infinity/-2       // -Infinity
 ```
 
-#### 取模操作符 `%`
+### 取模操作符 `%`
 
 ```javascript
     2%Infinity // 2
@@ -568,18 +576,16 @@ undefined|undefined|undefined
     0%2 // 0
 ```
 
-#### 指数操作符 `Math.pow()`、`**`
+### 指数操作符 `Math.pow()`、`**`
 
 ```javascript
     console.log(Math.pow(3, 2);    // 9
     console.log(3 ** 2);           // 9
 ```
 
-#### 加性操作符、减法操作符
+### （略）加性操作符、减法操作符 `+`、`-`
 
-+ ~
-
-#### 关系操作符
+### 关系操作符 `<`、`>`、`<=`、`>=`
 
 + 关系操作符执行比较两个值的操作，包括小于（`<` ）、大于（`>` ）、小于等于（`<=` ）和大于等于（`>=` ），这几个操作符都返回**布尔值**
   + 如果操作数都是`数值`，则执行`数值`比较。
@@ -589,7 +595,7 @@ undefined|undefined|undefined
   + 如果有任一操作数是`布尔值`，则将其转换为`数值`再执行比较。
   + 在比较`NaN` 时，**无论是小于还是大于等于，比较的结果都会返回`false`** 。
 
-#### 相等操作符 `=`、`!=`、`===`、`!==`
+### 相等操作符 `=`、`!=`、`===`、`!==`
 
 + ECMAScript中的等于操作符用两个等于号（`==` ）表示，如果操作数相等，则会返回`true` 。不等于操作符用叹号和等于号（`!=` ）表示，如果两个操作数不相等，则会返回`true` 。这两个操作符都会**先进行类型转换**（通常称为强制类型转换 ）再确定操作数是否相等。
   + 如果**任一操作数**是`布尔值`，则将其转换为`数值`再比较是否相等。`false` 转换为`0`，`true` 转换为`1`。
@@ -625,7 +631,7 @@ null == 0|false
     null === undefined // false，类型不想等
 ```
 
-#### 条件操作符 `? :`
+### 条件操作符 `? :`
 
 + 即根据条件表达式`boolean_expression` 的值决定将哪个值赋给变量`variable` 。如果`boolean_expression` 是`true` ，则赋值`true_value` ；如果`boolean_expression` 是`false` ，则赋值`false_value` 。
 
@@ -633,14 +639,14 @@ null == 0|false
     variable = boolean_expression ? true_value : false_value;
 ```
 
-#### 赋值操作符 `=`
+### 赋值操作符 `=`
 
 + **赋值与拷贝（复制）不是同一种东西**
 + **赋值与拷贝（复制）不是同一种东西**
 + **赋值与拷贝（复制）不是同一种东西**
 + `+=`、`*=`... 等等，这些操作符**仅仅是简写语法，使用它们不会提升性能。**
 
-#### 逗号操作符 `,`
+### 逗号操作符 `,`
 
 ```javascript
     let num1 = 1, num2 = 2, num3 = 3;
@@ -648,39 +654,109 @@ null == 0|false
     let num = (5, 1, 4, 8, 0); // num的值为0，不常见
 ```
 
-## 语句
+## （略）语句
 
-+ ~ TODO
+## 变量、作用域与内存
 
-+ 原始值指的是**原始类型**的值，也叫 基本类型，例如 Number、Stirng、Boolean、Null、Underfined。引用值指的是**引用类型**的值，例如 Object、Function、Array、Date、RegExp 。类似Python可变变量与不可变变量。
-+ 原始类型的初始化可以只使用原始字面量形式。如果使用的是new 关键字，则JavaScript会创建一个Object 类型的实例，但其行为**类似**原始值。下面来看看这两种初始化方式的差异：
+[目录](#javascript-高级程序设计第四版-笔记)
+
+### 原始值与引用值
+
++ 原始值指的是**原始类型**的值，也叫 `基本类型`，例如 `Number`、`Stirng`、`Boolean`、`Null`、`Underfined`、`Symbol` 。保存原始值的变量是按值 （by value）访问的，因为我们操作的就是**存储在变量中的实际值**。
++ 引用值指的是**引用类型**的值，例如 `Object`、`Function`、`Array`、`Date`、`RegExp` 。**实际上操作的是对该对象的引用 （reference）而非实际的对象本身**。类似Python中的`可变变量`与`不可变变量`。
+
+### 动态属性
+
++ 原始类型的初始化可以只使用原始`字面量`形式。如果使用的是`new` 关键字，则JavaScript会创建一个`Object` 类型的实例，但其行为**类似**原始值。下面来看看这两种初始化方式的差异：
 
 ```javascript
     let name1 = "Nicholas";
     let name2 = new String("Matt");
     name1.age = 27;
     name2.age = 26;
+    console.log(name1);        // "Nicholas"
+    console.log(name2);        // String {"Nicholas"}
     console.log(name1.age);    // undefined
     console.log(name2.age);    // 26
     console.log(typeof name1); // string
     console.log(typeof name2); // object
 ```
 
+### 复制值
+
++ 除了[存储方式](#原始值与引用值)不同，`原始值`和`引用值`在通过变量复制时也有所不同。在通过变量把一个原始值赋值到另一个变量时，原始值会**被复制到新变量的位置**。
+
+```javascript
+    let num1 = 5;
+    let num2 = num1;
+```
+
+var|value
+--|:--:
+num1|5
+num2|5
+
++ 在把`引用值`从一个变量赋给另一个变量时，存储在变量中的值也会被复制到新变量所在的位置。区别在于，这里复制的值实际上是一个`指针`，它指向存储在堆内存中的对象。操作完成后，两个变量**实际上指向同一个对象**，因此一个对象上面的变化会在另一个对象上反映出来。
+
+```javascript
+    let obj1 = new Object();
+    let obj2 = obj1;
+    obj1.name = "Nicholas";
+    console.log(obj2.name); // "Nicholas"
+```
+
+var|value
+--|:--:
+obj1|-> Object1
+obj2|-> Object1
+
+### 传递参数
+
 + **ECMAScript中所有函数的参数都是按值传递的。**
 + **ECMAScript中所有函数的参数都是按值传递的。**
 + **ECMAScript中所有函数的参数都是按值传递的。**
++ 数外的值会被`复制`到函数内部的参数中，就像从一个变量`复制`到另一个变量一样。（**改变引用值会影响函数外部**）
+
+```javascript
+    function test(num, obj) {
+        num += 10;
+        obj.name = 'jack'
+        return num;
+    }
+    
+    let num1 = 10
+    let obj1 = {}
+    console.log(test(num1, obj1)) // 20
+    console.log(num1)             // 10
+    console.log(obj1)             // {name: "jack"}
+```
+
++ 很多开发者**错误地认为**，当在局部作用域中修改对象而变化反映到全局时，就意味着参数是按引用传递的 **X**。
 
 ```javascript
     function setName(obj) {
-    obj.name = "Nicholas";  // obj与 person是同一个地址值，指向同一个地址，影响不到 person
-    obj = new Object(); // obj地址值改变，影响不到 person
-    obj.name = "Greg";
+        obj.name = "Nicholas";  // obj与 person的值相同，指向同一个地址，可以影响person
+        obj = new Object(); // obj的值改变，指向不同的内存地址值，影响不到 person
+        obj.name = "Greg";
     }
 
     let person = new Object();
-    setName(person); // 把 person的地址值传给 obj
+    setName(person); // 把person 的值复制给 obj
     console.log(person.name);  // "Nicholas"
 ```
+
+### 确定类型
+
+#### 判断类型 `typeof`、`instanceof`
+
++ `typeof` 操作符最适合用来判断一个变量是否为`原始类型`。它是判断一个`变量`是否为`字符串`、`数值`、`布尔值`或`undefined` 的最好方式。如果值是对象或`null` ，那么`typeof` 返回`"object"`，我们可以使用`instanceof` 判断引用类型的类型：
+
+```javascript
+    result = variable instanceof constructor
+```
+
+#### 执行上下文与作用域
+
 
 + 垃圾回收，用到过两种主要的标记策略：标记清理和引用计数（基本不用）。标记清理垃圾回收程序运行的时候，会标记内存中存储的所有变量（记住，标记方法有很多种）。然后，它会将所有在上下文中的变量，以及被在上下文中的变量引用的变量的标记去掉。在此之后再被加上标记的变量就是待删除的了；引用计数思路是对每个值都记录它被引用的次数。声明变量并给它赋一个引用值时，这个值的引用数为1。如果同一个值又被赋给另一个变量，那么引用数加1。类似地，如果保存对该值引用的变量被其他值给覆盖了，那么引用数减1。当一个值的引用数为0时，就说明没办法再访问到这个值了，因此可以安全地收回其内存了。
 
