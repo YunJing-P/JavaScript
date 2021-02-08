@@ -185,7 +185,7 @@ undefined|NaN
 
     let foo = {}
     console.log(foo.toString());  // 字符串"[object Object]"
-    
+
     foo.toString = function(){
         return "Hi"
     }
@@ -243,7 +243,7 @@ undefined|NaN
     let interpolatedTemplateLiteral = `${ value } to the ${ exponent } power is ${ value * value }`;
 ```
 
-+ 所有插入的值都会使用`toString()` **强制转型为字符串**，而且任何JavaScript表达式都可以用于插值。嵌套的模板字符串无须转义：
++ 所有插入的值都会使用`toString()` **强制转型为字符串**，而且**任何JavaScript表达式** 都可以用于插值。嵌套的模板字符串无须转义：
 
 ```javascript
     console.log(`Hello, ${ `World` }!`);  // Hello, World!
@@ -254,7 +254,30 @@ undefined|NaN
     console.log(`Hello, ${ foo }!`);      // Hello, World!
 ```
 
-+ String.raw() 可以直接获取原始的模板字面量内容
++ 模板字面量也支持定义标签函数 （tag function），而通过标签函数可以自定义插值行为。标签函数会接收被插值记号**分隔后的模板** 和**对每个表达式求值的结果**。
++ 因为表达式参数的数量是可变的，所以通常应该使用剩余操作符（rest operator）`fun(arg1, ...args)`，将它们收集到一个数组中
+
+```javascript
+    let a = 6;
+    let b = 9;
+
+    function simpleTag(strings, ...expressions) {
+    console.log(strings);
+    console.log(expressions);
+
+    return 'foobar';
+    }
+
+    let untaggedResult = `${ a } + ${ b } = ${ a + b }`;
+    let taggedResult = simpleTag`${ a } + ${ b } = ${ a + b }`;
+    // ["", " + ", " = ", ""] 分隔后的模板
+    // [6, 9, 15]
+
+    console.log(untaggedResult);   // "6 + 9 = 15"
+    console.log(taggedResult);     // "foobar"
+```
+
++ `String.raw` 可以直接获取原始的模板字面量内容
 
 ```javascript
     console.log(`\u00A9`);            // ©
@@ -262,10 +285,13 @@ undefined|NaN
     console.log(String.raw`first line\nsecond line`); //"first line\nsecond line" 只能转\n，不能转实际换行
 ```
 
-+ Symbol() 符号是原始值，且符号实例是唯一、不可变的。
+### Symbol 类型
+
++ Symbol() 符号是原始值，且符号实例是唯一、不可变的。符号的用途是**确保对象属性使用唯一标识符**，不会发生属性冲突的危险。
++ 可以传入一个字符串参数作为对符号的描述（description），将来可以通过这个字符串来调试代码。但是，这个字符串参数与符号定义或标识**完全无关**：
 
 ```javascript
-    let genericSymbol = Symbol();
+    let genericSymbol = Symbol();    // 初始化
     let otherGenericSymbol = Symbol();
 
     let fooSymbol = Symbol('foo');
@@ -275,13 +301,172 @@ undefined|NaN
     console.log(fooSymbol == otherFooSymbol);          // false
 ```
 
-+ Symbol.for() 对每个字符串键都执行幂等操作。
++ `Symbol()` 函数**不能用作**构造函数，与`new` 关键字一起使用。这样做是为了避免创建符号包装对象，像使用`Boolean` 、`String` 或`Number` 那样，它们都支持构造函数且可用于初始化包含原始值的包装对象：
++ 如果运行时的不同部分需要**共享**和**重用**符号实例，那么可以用一个字符串作为键，在全局符号注册表中创建并重用符号。需要使用`Symbol.for()` 方法：
 
 ```javascript
     let fooGlobalSymbol = Symbol.for('foo');       // 创建新符号
     let otherFooGlobalSymbol = Symbol.for('foo');  // 重用已有符号
 
     console.log(fooGlobalSymbol === otherFooGlobalSymbol);  // true
+```
+
++ 可以使用`Symbol.keyFor()` 来查询全局注册表，这个方法接收符号，返回该全局符号对应的字符串键。如果查询的**不是全局符号**，则返回`undefined` 。如果传给`Symbol.keyFor()` 的不是符号，则该方法抛出**TypeError** ：
+
+```javascript
+    let s = Symbol.for('foo');
+    console.log(Symbol.keyFor(s));   // foo
+
+    // 创建普通符号
+    let s2 = Symbol('bar');
+    console.log(Symbol.keyFor(s2));  // undefined
+
+    Symbol.keyFor(123); // TypeError: 123 is not a symbol
+```
+
++ 凡是可以使用字符串或数值作为属性的地方，都可以使用符号。这就包括了对象字面量属性和`Object.defineProperty()`、`Object.defineProperties()` 定义的属性。对象字面量只能在计算属性语法中使用符号作为属性。
+
+```javascript
+    let s1 = Symbol('foo'),
+        s2 = Symbol('bar'),
+        s3 = Symbol('baz'),
+        s4 = Symbol('qux');
+
+    let o = {
+        [s1]: 'foo val'    // 这样也可以：o[s1] = 'foo val';
+    };
+
+    console.log(o);    // {Symbol(foo): foo val}
+
+    Object.defineProperty(o, s2, {value: 'bar val'});
+
+    console.log(o);    // {Symbol(foo): foo val, Symbol(bar): bar val}
+
+    Object.defineProperties(o, {
+        [s3]: {value: 'baz val'},
+        [s4]: {value: 'qux val'}
+    });
+
+    console.log(o);
+    // {Symbol(foo): foo val, Symbol(bar): bar val, Symbol(baz): baz val, Symbol(qux): qux val}
+```
+
++ 类似于`Object.getOwnPropertyNames()` 返回对象实例的**常规属性数组**，`Object.getOwnPropertySymbols()` 返回对象实例的**符号属性数组**。这两个方法的返回值**彼此互斥**。`Object.getOwnPropertyDescriptors()` 会返回**同时包含常规和符号属性描述符**的对象。`Reflect.ownKeys()`会返回两种类型的**键**：
+
+```javascript
+    let s1 = Symbol('foo'), s2 = Symbol('bar');
+
+    let o = {
+        [s1]: 'foo val',
+        [s2]: 'bar val',
+        baz: 'baz val',
+        qux: 'qux val'
+    };
+
+    console.log(Object.getOwnPropertySymbols(o));
+    // [Symbol(foo), Symbol(bar)]
+
+    console.log(Object.getOwnPropertyNames(o));
+    // ["baz", "qux"]
+
+    console.log(Object.getOwnPropertyDescriptors(o));
+    // {baz: {...}, qux: {...}, Symbol(foo): {...}, Symbol(bar): {...}}
+
+    console.log(Reflect.ownKeys(o));
+    // ["baz", "qux", Symbol(foo), Symbol(bar)]
+```
+
++ `Symbol`**剩下的以后再看**
+
+### Object 类型
+
++ 开发者可以通过创建Object 类型的实例来创建自己的对象，然后再给对象添加属性和方法：
+
+```javascript
+    let o = new Object();
+```
+
++ 每个Object 实例都有如下属性和方法。
++ `constructor` ：用于创建当前对象的函数。在前面的例子中，这个属性的值就是`Object()` 函数。
++ `hasOwnProperty(propertyName )` ：用于判断当前对象实例（不是原型）上是否存在给定的属性。要检查的属性名必须是字符串（如`o.hasOwnProperty("name")` ）或**符号**。
++ `isPrototypeOf(object )` ：用于判断**当前对象是否为另一个对象的原型**。
++ `propertyIsEnumerable(propertyName )` ：用于判断给定的属性是否可以使用`for-in` 语句枚举。与`hasOwnProperty()` 一样，属性名必须是字符串。
++ `toLocaleString()` ：返回对象的字符串表示，该字符串反映对象所在的本地化执行环境。
++ `toString()` ：返回对象的字符串表示。
++ `valueOf()` ：返回对象对应的**字符串、数值或布尔值表示**。通常与`toString()` 的返回值相同。
+
+## 操作符
+
+### 一元操作符
+
++ ~
+
+### 位操作符
+
++ 负值以一种称为二补数 （或补码）的二进制编码存储。一个数值的二补数通过如下3个步骤计算得到：
+  + 确定绝对值的二进制表示（如，对于-18，先确定18的二进制表示）；
+  + 找到数值的一补数（或反码），换句话说，就是每个**0都变成1**，**每个1都变成0**；
+  + 给结果加1。
+
+```javascript
+    0000  0000  0000  0000  0000  0000  0001  0010 // 二进制表示，此处为18
+    1111  1111  1111  1111  1111  1111  1110  1101 // 找到反码
+    1111  1111  1111  1111  1111  1111  1110  1110 // 加1
+```
+
++ 如果将位操作符应用到**非数值**，那么首先会使用`Number()` 函数将该值**转换为数值**（这个过程是自动的），然后再应用位操作。最终结果是数值。
++ `按位非`操作符用波浪符（`~` ）表示，它的作用是返回**数值的一补数**。
++ `按位非`的最终效果是对**数值取反并减1**
+
+```javascript
+    let num1 = 25;      // 二进制00000000000000000000000000011001
+    let num2 = ~num1;   // 二进制11111111111111111111111111100110
+    console.log(num2);  // -26
+```
+
++ `按位与`：`按位与`操作在两个位**都是1时返回1，在任何一位是0时返回0**。
+
+```javascript
+    let result = 25 & 3; // 11001 & 00011 = 00001
+    console.log(result); // 1
+```
+
++ `按位或`：`按位或`操作在**至少一位是1时返回1，两位都是0时返回0**。
+
+```javascript
+    let result = 25 | 3; // 11001 | 00011 = 11011
+    console.log(result); // 27
+```
+
++ `按位异或`：它只在一位上是**1的时候返回1（两位都是1或0，则返回0）**。
+
+```javascript
+    let result = 25 ^ 3; // 11001 ^ 00011 = 11010
+    console.log(result); // 26
+```
+
++ `左移`：`左移`操作符用两个小于号（`<<`）表示，会按照指定的**位数**将数值的所有位向左移动。
++ 注意，`左移`会**保留它所操作数值的符号**。比如，如果-2左移5位，将得到-64，而不是正64。
+
+```javascript
+    let oldValue = 2;              // 二进制10
+    let newValue = oldValue << 5;  // 等于二进制1000000，即十进制64
+```
+
++ `有符号右移`,由两个大于号（`>>` ）表示，会将数值的所有32位都向右移，同时**保留符号**（正或负）。
++ 移位后就会出现空位。不过，右移后空位会出现在左侧，且在**符号位之后**
+
+```javascript
+    let oldValue = 64;             // 等于二进制1000000
+    let newValue = oldValue >> 5;  // 等于二进制10，即十进制2
+```
+
++ `无符号` 右移用3个大于号表示（`>>>` ），会将数值的所有32位都向右移。
++ 与`有符号右移` **不同**，无符号右移会给空位补0，而**不管符号位是什么**。
+
+```javascript
+    let oldValue = -64;              // 等于二进制11111111111111111111111111000000 二进制64取反码加1
+    let newValue = oldValue >>> 5;   // 等于十进制134217726
 ```
 
 + 逻辑与操作符（&&）可用于任何类型的操作数，不限于布尔值。如果有操作数不是布尔值，**则逻辑与并不一定会返回布尔值**，而是遵循如下规则；如果第一个操作数是对象，则返回第二个操作数；如果第二个操作数是对象，则只有第一个操作数求值为true 才会返回该对象；如果两个操作数都是对象，则返回第二个操作数；如果有一个操作数是null ，则返回null；如果有一个操作数是NaN，则返回NaN；如果有一个操作数是undefined ，则返回undefined。
