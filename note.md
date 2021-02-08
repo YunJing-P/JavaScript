@@ -6,7 +6,7 @@
 
 [目录](#javascript-高级程序设计第四版-笔记)
 
-### let & var
+### let var
 
 + `let` 声明的范围是**块** 作用域，而`var` 声明的范围是**函数** 作用域。
 + 在使用`var` 声明变量时，由于声明会被**提升** ，JavaScript引擎会自动将多余的声明在作用域顶部合并为一个声明。提升只会**存在声明，不会赋值。**
@@ -747,7 +747,7 @@ obj2|-> Object1
 
 ### 确定类型
 
-#### 判断类型 `typeof`、`instanceof`
+#### 判断类型 （typeof、instanceof）
 
 + `typeof` 操作符最适合用来判断一个变量是否为`原始类型`。它是判断一个`变量`是否为`字符串`、`数值`、`布尔值`或`undefined` 的最好方式。如果值是对象或`null` ，那么`typeof` 返回`"object"`，我们可以使用`instanceof` 判断引用类型的类型：
 
@@ -945,5 +945,5 @@ obj2|-> Object1
 ```
 
 + 构造函数模式
-+ [判断类型 `typeof`、`instanceof`](#判断类型-`typeof`、`instanceof`)
-+ [let & var](#let-&-var)
++ [判断类型 `typeof`、`instanceof`](#判断类型-（typeof、instanceof）)
++ [let & var](#let-var)
