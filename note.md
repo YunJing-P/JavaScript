@@ -760,7 +760,7 @@ obj2|-> Object1
 #### 执行上下文与作用域
 
 + 垃圾回收，用到过两种主要的标记策略：标记清理和引用计数（基本不用）。标记清理垃圾回收程序运行的时候，会标记内存中存储的所有变量（记住，标记方法有很多种）。然后，它会将所有在上下文中的变量，以及被在上下文中的变量引用的变量的标记去掉。在此之后再被加上标记的变量就是待删除的了；引用计数思路是对每个值都记录它被引用的次数。声明变量并给它赋一个引用值时，这个值的引用数为1。如果同一个值又被赋给另一个变量，那么引用数加1。类似地，如果保存对该值引用的变量被其他值给覆盖了，那么引用数减1。当一个值的引用数为0时，就说明没办法再访问到这个值了，因此可以安全地收回其内存了。
-
++ **TODO！！！！！！！！！**
 + 隐藏类和删除操作 - 以后再过一下
 + 内存泄漏 - 以后再过一下
 + RegExp 正则先跳过
@@ -947,3 +947,58 @@ obj2|-> Object1
 ```
 
 + 构造函数模式
+
+### 函数
+
+#### 闭包
+
++ `匿名函数`经常被人**误认为**是`闭包（closure）`。
++ `闭包` 指的是那些**引用了另一个函数作用域中变量的函数**，通常是在嵌套函数中实现的。
+
+```javascript
+    function createComparisonFunction(propertyName) {
+        return function(object1, object2) {
+            let value1 = object1[propertyName];
+            let value2 = object2[propertyName];
+
+            if (value1 < value2) {
+                return -1;
+            } else if (value1 > value2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        };
+    }
+```
+
++ 这里定义的`compare()` 函数是在全局上下文中调用的。第一次调用`compare()` 时，会为它创建一个包含`arguments` 、`value1` 和`value2` 的活动对象，这个对象是其作用域链上的第一个对象。而全局上下文的变量对象则是`compare()` 作用域链上的第二个对象，其中包含`this` 、`result` 和`compare` 。
+
+```javascript
+    function compare(value1, value2) {
+        if (value1 < value2) {
+            return -1;
+        } else if (value1 > value2) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    let result = compare(5, 10);
+```
+
+![avatar](http://elaiza.cc/img/js_note/Image00020.png)
+
++ 函数执行时，每个执行上下文中都会有一个包含其中变量的对象。全局上下文中的叫**变量对象**，它会在代码执行期间始终存在。而函数局部上下文中的叫**活动对象**，只在函数执行期间存在。
++ 在调用一个函数时，会为这个函数调用创建一个执行上下文，并创建一个作用域链。然后用`arguments` 和`其他命名参数`来初始化这个函数的活动对象。外部函数的活动对象是内部函数作用域链上的第二个对象。这个作用域链**一直向外串起**了所有包含函数的活动对象，直到**全局执行上下文**才终止。
++ 一个函数内部定义的函数会把**其包含函数的活动对象添加到自己的作用域链中**。因此，在`createComparisonFunction()` 函数中，匿名函数的作用域链中实际上包含`createComparisonFunction()` 的活动对象。
+
+```javascript
+    let compare = createComparisonFunction('name');
+    let result = compare({ name: 'Nicholas' }, { name: 'Matt' });
+```
+
+![avatar](http://elaiza.cc/img/js_note/Image00021.png)
+
++ `createComparisonFunction()` 的活动对象**并不能**在它执行完毕后销毁，因为匿名函数的作用域链中**仍然有对它的引用**。在`createComparisonFunction()` 执行完毕后，其执行上下文的作用域链会销毁，但它的活动对象仍然会保留在内存中，**直到匿名函数被销毁后才会被销毁**。
