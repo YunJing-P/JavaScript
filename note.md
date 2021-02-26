@@ -948,7 +948,142 @@ obj2|-> Object1
 
 + 构造函数模式
 
+### 对象、类与面向对象编程
+
+#### 对象创建
+
+```javascript
+    let person = new Object();
+    person.name = "Nicholas";
+    person.age = 29;
+    person.job = "Software Engineer";
+    person.sayName = function() {
+        console.log(this.name);
+    };
+
+    // 流行
+    let person = {
+        name: "Nicholas",
+        age: 29,
+        job: "Software Engineer",
+        sayName() {
+            console.log(this.name);
+        }
+    };
+```
+
+#### new的时候发生了什么
+
+```javascript
+ 
+    function Person () {
+        this.name = name;
+        this.age = age;
+        this.sex = sex
+    
+        this.sayName = function () {
+            return this.name;
+        };
+    }
+    
+    var person = new Person("tom", 21, "famle");
+    
+    console.log(person.name);
+```
+
++ 创建一个新对象
++ 将新对象的`_proto_`指向构造函数的`prototype`对象
++ 将构造函数的**作用域**赋值给新对象 （也就是`this`指向新对象）
++ 执行构造函数中的代码（为这个新对象添加属性）
++ 返回新的对象
++ [call函数](#call)
+
+```javascript
+    var Obj = {};
+ 
+    Obj._proto_ =  Person.prototype();
+    
+    Person.call(Obj);
+```
+
 ### 函数
+
+#### this
+
++ `this` 在**标准函数**和**箭头函数**中有**不同**的行为。
++ 在标准函数中，`this` 引用的是把函数当成方法调用的**上下文对象**，这时候通常称其为`this` 值（在网页的**全局上下文**中调用函数时，**`this` 指向`window`对象**，如果作为**某个对象的方法调用**，则`this` 等于这个对象。）。
++ 在**严格模式**下，如果在全局函数中调用`this` ，`this`等于`undefined` 。
++ 箭头函数中的`this` 会**保留定义该函数时的上下文**。
+
+```javascript
+    window.color = 'red';
+    let o = {
+        color: 'blue'
+    };
+
+    // 标准函数
+    function sayColor1() {
+        console.log(this.color);
+    }
+
+    sayColor1();    // 'red' ，this 指向window
+
+    o.sayColor = sayColor1;
+    o.sayColor();  // 'blue'， this 指向对象o
+
+    // 箭头函数
+    sayColor2 = () => {
+        console.log(this.color);
+    }
+
+    sayColor2();    // 'red' ，this 指向window
+
+    o.sayColor = sayColor2;
+    o.sayColor();  // 'red'， this 指向window
+```
+
+#### call
+
++ **重点！！！！！！！**
++ **重点！！！！！！！**
++ **重点！！！！！！！**
++ `apply()` 、`call()` 、`bind()` ，这三个方法都会以指定的this 值来调用函数，即会**设置调用函数时函数体内this 对象的值**。
+
+```javascript
+    function sum(num1, num2) {
+        return num1 + num2;
+    }
+
+    function callSum1(num1, num2) {
+        return sum.call(this, num1, num2); // call() 传入多个参数
+    }
+
+    function callSum2(num1, num2) {
+        return sum.apply(this, [num1, num2]); // apply() 传入数组
+    }
+
+    console.log(callSum1(10, 10)); // 20
+    console.log(callSum2(10, 10)); // 20
+```
+
++ `apply()` 和`call()` 真正强大的地方并不是给函数传参，而是**控制函数调用上下文**即函数体内`this` 值的能力。
+
+```javascript
+    window.color = 'red';
+    let o = {
+        color: 'blue'
+    };
+
+    function sayColor() {
+        console.log(this.color);
+    }
+
+    sayColor();             // 'red' ，this 指向window
+
+    sayColor.call(this);    // 'red' ，this 指向window
+    sayColor.call(window);  // 'red' ，this 指向window
+    sayColor.call(o);       // 'blue' ， this 指向对象o
+```
 
 #### 闭包
 
@@ -1002,3 +1137,4 @@ obj2|-> Object1
 ![avatar](http://elaiza.cc/img/js_note/Image00021.png)
 
 + `createComparisonFunction()` 的活动对象**并不能**在它执行完毕后销毁，因为匿名函数的作用域链中**仍然有对它的引用**。在`createComparisonFunction()` 执行完毕后，其执行上下文的作用域链会销毁，但它的活动对象仍然会保留在内存中，**直到匿名函数被销毁后才会被销毁**。
++ TODO
