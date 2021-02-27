@@ -1010,6 +1010,7 @@ obj2|-> Object1
 
 #### this
 
++ 箭头函数没有`arguments` todo
 + `this` 在**标准函数**和**箭头函数**中有**不同**的行为。
 + 在标准函数中，`this` 引用的是把函数当成方法调用的**上下文对象**，这时候通常称其为`this` 值（在网页的**全局上下文**中调用函数时，**`this` 指向`window`对象**，如果作为**某个对象的方法调用**，则`this` 等于这个对象。）。
 + 在**严格模式**下，如果在全局函数中调用`this` ，`this`等于`undefined` 。
@@ -1029,7 +1030,7 @@ obj2|-> Object1
     sayColor1();    // 'red' ，this 指向window
 
     o.sayColor = sayColor1;
-    o.sayColor();  // 'blue'， this 指向对象o
+    o.sayColor();  // 'blue'，对象.标准函数，this 指向对象o
 
     // 箭头函数
     sayColor2 = () => {
@@ -1039,7 +1040,7 @@ obj2|-> Object1
     sayColor2();    // 'red' ，this 指向window
 
     o.sayColor = sayColor2;
-    o.sayColor();  // 'red'， this 指向window
+    o.sayColor();  // 'red'，对象.箭头函数，声明的时候固定了this，this 指向window
 ```
 
 #### call
@@ -1047,7 +1048,7 @@ obj2|-> Object1
 + **重点！！！！！！！**
 + **重点！！！！！！！**
 + **重点！！！！！！！**
-+ `apply()` 、`call()` 、`bind()` ，这三个方法都会以指定的this 值来调用函数，即会**设置调用函数时函数体内this 对象的值**。
++ `apply()` 、`call()` 、`bind()` ，这三个方法都会以指定的`this` 值来调用函数，即会**设置调用函数时函数体内this 对象的值**。
 
 ```javascript
     function sum(num1, num2) {
@@ -1079,7 +1080,6 @@ obj2|-> Object1
     }
 
     sayColor();             // 'red' ，this 指向window
-
     sayColor.call(this);    // 'red' ，this 指向window
     sayColor.call(window);  // 'red' ，this 指向window
     sayColor.call(o);       // 'blue' ， this 指向对象o
