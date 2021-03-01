@@ -1027,7 +1027,7 @@ book.year = 2018;
 console.log(book.edition); // 2
 ```
 
-#### 定义多个属性
+#### 定义多个属性的特性
 
 + `Object.defineProperties()` 方法。这个方法可以通过多个描述符一次性定义多个属性。它接收两个参数：**要为之添加或修改属性的对象和另一个描述符对象**，其属性与要添加或修改的属性一一对应。
 + 这段代码在`book` 对象上定义了两个数据属性`year_` 和`edition` ，还有一个访问器属性`year` 。最终的对象跟上面例中的一样。唯一的区别是**所有属性都是同时定义的**，并且数据属性的`configurable` 、`enumerable` 和`writable` 特性值**都是false** 。
@@ -1064,6 +1064,99 @@ book.year = 2019 // 修改不会成功，因为year_ 和edition 的writable 属�
 console.log(book.year) // 把year_ 和edition 的writable 设置为true ，看看效果
 console.log(book.edition)
 ```
+
+#### 读取属性的特性
+
++ `Object.getOwnPropertyDescriptor()` 方法可以取得指定属性的属性描述符。
+
+```javascript
+let book = {};
+Object.defineProperties(book, {
+  year_: {
+    value: 2017
+  },
+
+  edition: {
+    value: 1
+  },
+
+  year: {
+    get: function() {
+      return this.year_;
+    },
+
+    set: function(newValue){
+      if (newValue > 2017) {
+        this.year_ = newValue;
+        this.edition += newValue - 2017;
+      }
+    }
+  }
+});
+
+let descriptor = Object.getOwnPropertyDescriptor(book, "year_");
+console.log(descriptor.value);          // 2017
+console.log(descriptor.configurable);   // false
+console.log(typeof descriptor.get);     // "undefined"
+let descriptor = Object.getOwnPropertyDescriptor(book, "year");
+console.log(descriptor.value);          // undefined
+console.log(descriptor.enumerable);     // false
+console.log(typeof descriptor.get);     // "function"
+```
+
++ `Object.getOwnPropertyDescriptors()` 静态方法。这个方法实际上会在每个自有属性上调用`Object.getOwnPropertyDescriptor()` 并在一个新对象中返回它们。
+
+```javascript
+let book = {};
+Object.defineProperties(book, {
+  year_: {
+    value: 2017
+  },
+
+  edition: {
+    value: 1
+  },
+
+  year: {
+    get: function() {
+      return this.year_;
+    },
+
+    set: function(newValue){
+      if (newValue > 2017) {
+        this.year_ = newValue;
+        this.edition += newValue - 2017;
+      }
+    }
+  }
+});
+
+console.log(Object.getOwnPropertyDescriptors(book));
+// {
+//   edition: {
+//     configurable: false,
+//     enumerable: false,
+//     value: 1,
+//     writable: false
+//   },
+//   year: {
+//     configurable: false,
+//     enumerable: false,
+//     get: f(),
+//     set: f(newValue),
+//   },
+//   year_: {
+//     configurable: false,
+//     enumerable: false,
+//     value: 2017,
+//     writable: false
+//   }
+// }
+```
+
+#### 合并对象
+
++ `Object.assign()` 方法。这个方法接收一个`目标对象`和一个或多个`源对象`作为参数，然后将每个源对象中可枚举（`Object.propertyIsEnumerable()` 返回`true` ）和自有（`Object.hasOwnProperty()` 返回`true` ）属性复制到目标对象。以**字符串和符号为键的属性会被复制**。对每个符合条件的属性，这个方法会使用源对象上的`Get` 取得属性的值，然后使用目标对象上的`Set` 设置属性的值。
 
 #### new的时候发生了什么
 
