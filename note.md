@@ -1156,7 +1156,210 @@ console.log(Object.getOwnPropertyDescriptors(book));
 
 #### 合并对象
 
-+ `Object.assign()` 方法。这个方法接收一个`目标对象`和一个或多个`源对象`作为参数，然后将每个源对象中可枚举（`Object.propertyIsEnumerable()` 返回`true` ）和自有（`Object.hasOwnProperty()` 返回`true` ）属性复制到目标对象。以**字符串和符号为键的属性会被复制**。对每个符合条件的属性，这个方法会使用源对象上的`Get` 取得属性的值，然后使用目标对象上的`Set` 设置属性的值。
++ `Object.assign()` 方法。这个方法接收一个`目标对象`和一个或多个`源对象`作为参数，然后将每个源对象中可枚举（`Object.propertyIsEnumerable()` 返回`true` ）和自有（`Object.hasOwnProperty()` 返回`true` ）属性复制到目标对象。以**字符串和符号为键的属性会被复制**。对每个符合条件的属性，这个方法会使用源对象上的`Get` 取得属性的值，然后使用目标对象上的`Set` 设置属性的值。此外，从源对象访问器属性取得的值，比如获取函数，会作为一个**静态值**赋给目标对象。换句话说，**不能在两个对象间转移获取函数和设置函数**。
+
+```javascript
+let dest, src, result;
+
+/**
+ * 覆盖属性
+ */
+dest = { id: 'dest' };
+
+result = Object.assign(dest, { id: 'src1', a: 'foo' }, { id: 'src2', b: 'bar' });
+
+// Object.assign会覆盖重复的属性
+console.log(result); // { id: src2, a: foo, b: bar }
+
+// 可以通过目标对象上的设置函数观察到覆盖的过程：
+dest = {
+  set id(x) {
+    console.log(x);
+  }
+};
+
+Object.assign(dest, { id: 'first' }, { id: 'second' }, { id: 'third' });
+// first
+// second
+// third
+
+
+/**
+ * 对象引用
+ */
+
+dest = {};
+src = { a: {} };
+src.a.name = 'pyj'
+Object.assign(dest, src);
+
+// 浅复制意味着只会复制对象的引用
+console.log(dest);              // { a :{ name: "pyj"} }
+console.log(dest.a === src.a);  // true
+```
+
+#### 对象标识及相等判定
+
++ 有些特殊情况即使是=== 操作符也无能为力，为改善这类情况，ECMAScript 6规范新增了`Object.is()` ，这个方法与`===` 很像，但同时也考虑到了上述边界情形。这个方法必须接收两个参数：
+
+```javascript
+// 这些是===符合预期的情况
+console.log(true === 1);  // false
+console.log({} === {});   // false
+console.log("2" === 2);   // false
+
+// 这些情况在不同JavaScript引擎中表现不同，但仍被认为相等
+console.log(+0 === -0);   // true
+console.log(+0 === 0);    // true
+console.log(-0 === 0);    // true
+
+// 要确定NaN的相等性，必须使用极为讨厌的isNaN()
+console.log(NaN === NaN); // false
+console.log(isNaN(NaN));  // true
+
+// Object.is()
+console.log(Object.is(true, 1));  // false
+console.log(Object.is({}, {}));   // false
+console.log(Object.is("2", 2));   // false
+
+// 正确的0、-0、+0相等/不等判定
+console.log(Object.is(+0, -0));   // false
+console.log(Object.is(+0, 0));    // true
+console.log(Object.is(-0, 0));    // false
+
+// 正确的NaN相等判定
+console.log(Object.is(NaN, NaN)); // true
+```
+
++ 要检查超过两个值，递归地利用相等性传递即可：
+
+```javascript
+function recursivelyCheckEqual(x, ...rest) {
+  return Object.is(x, rest[0]) && (rest.length < 2 || recursivelyCheckEqual(...rest));
+}
+```
+
+#### 增强的对象语法
+
++ **简写属性名**只要使用变量名（不用再写冒号）就会自动被解释为**同名的属性键**。
+
+```javascript
+let name = 'Matt';
+
+let person = {
+  name: name
+};
+
+// 等价
+
+let person = {
+  name
+};
+```
+
++ **可计算属性**
+
+```javascript
+const nameKey = 'name';
+const ageKey = 'age';
+const jobKey = 'job';
+
+let person1 = {};
+person1[nameKey] = 'Matt';
+person1[ageKey] = 27;
+person1[jobKey] = 'Software engineer';
+
+// 使用可计算属性
+let person2 = {
+  [nameKey]: 'Matt',
+  [ageKey]: 27,
+  [jobKey]: 'Software engineer'
+};
+
+let uniqueToken = 0;
+
+function getUniqueKey(key) {
+  return `${key}_${uniqueToken++}`;
+}
+
+// 也可以是复杂的表达式，在实例化时再求值
+let person3 = {
+  [getUniqueKey(nameKey)]: 'Matt',
+  [getUniqueKey(ageKey)]: 27,
+  [getUniqueKey(jobKey)]: 'Software engineer'
+};
+
+```
+
++ **简写方法名**
+
+```javascript
+let person = {
+  sayName: function(name) {
+    console.log(`My name is ${name}`);
+  }
+};
+
+// 等价
+let person = {
+  sayName(name) {
+    console.log(`My name is ${name}`);
+  }
+};
+```
+
+#### 对象解构
+
++ 常规用法
+
+```javascript
+// 使用对象解构
+let person = {
+  name: 'Matt',
+  age: 27
+};
+
+let { name: personName, age, job, body='good'} = person;
+
+console.log(personName);  // Matt, personName = person.name, personname 是别名
+console.log(age);   // 27, age = person.age, 省略即默认同名
+console.log(job);   // undeifned ,引用的属性不存在
+console.log(body);   // good ,引用的属性不存在,但有默认值
+```
+
++ 解构并**不要求**变量必须在解构表达式中**声明**。不过，如果是给事先声明的变量赋值，则赋值表达式必须**包含在一对括号中**。
+
+```javascript
+let personName, personAge;
+
+let person = {
+  name: 'Matt',
+  age: 27
+};
+
+({name: personName, age: personAge} = person);
+```
+
++ 需要注意的是，涉及多个属性的解构赋值是一个输出无关的顺序化操作。如果一个解构表达式涉及多个赋值，开始的赋值成功而**后面的赋值出错**，则整个解构赋值**只会完成一部分**
+
+```javascript
+let person = {
+  name: 'Matt',
+  age: 27
+};
+
+let personName, personBar, personAge;
+
+try {
+  // person.foo是undefined，因此会抛出错误
+  ({name: personName, foo: { bar: personBar }, age: personAge} = person);
+} catch(e) {}
+
+console.log(personName, personBar, personAge);
+// Matt, undefined, undefined
+```
+
+### 创建对象
 
 #### new的时候发生了什么
 
