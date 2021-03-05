@@ -1379,11 +1379,12 @@ var person = new Person("tom", 21, "famle");
 console.log(person.name);
 ```
 
-+ 创建一个新对象
-+ 将新对象的`_proto_`指向构造函数的`prototype`对象
-+ 将构造函数的**作用域**赋值给新对象 （也就是`this`指向新对象）
-+ 执行构造函数中的代码（为这个新对象添加属性）
-+ 返回新的对象
+1 在内存中创建一个新对象。
+2 这个新对象内部的`Prototype` 特性被赋值为构造函数的`prototype` 属性。
+3 构造函数内部的`this` 被赋值为这个新对象（即`this` 指向新对象）。
+4 执行构造函数内部的代码（给新对象添加属性）。
+5 如果构造函数返回非空对象，则返回该对象；否则，返回刚创建的新对象。
+
 + [call函数](#call)
 
 ```javascript
@@ -1471,6 +1472,153 @@ sayColor();             // 'red' ，this 指向window
 sayColor.call(this);    // 'red' ，this 指向window
 sayColor.call(window);  // 'red' ，this 指向window
 sayColor.call(o);       // 'blue' ， this 指向对象o
+```
+
++ 可以这样理解，`Person` 作为构造函数使用了`o` 的作用域，并传入3个参数，`Person` 里面的`this.xx` 让`o` 也拥有了xx属性
+
+```javascript
+let Person = function(name, age, job) {
+  this.name = name;
+  this.age = age;
+  this.job = job;
+  this.sayName = function() {
+    console.log(this.name);
+  };
+}
+
+let o = new Object();
+Person.call(o, "Kristen", 25, "Nurse");
+o.sayName();   // "Kristen"
+```
+
+#### 原型模式
+
++ **重点！！！！！！！！全文背诵**
++ **重点！！！！！！！！全文背诵**
++ **重点！！！！！！！！全文背诵**
+
+![avatar](http://elaiza.cc/img/js_note/Image00022.png)
+  
+#### 原型层级
+
++ 在通过对象访问属性时，如果对象上没有该属性，会沿着**原型链**一层一层往下搜索，再返回值
++ 对象上设置了值以后，即使在实例上把这个属性设置为`null` ，也**不会恢复它和原型的联系**，需要使用`delete` 操作符
+
+```javascript
+function Person() {}
+
+Person.prototype.name = "Nicholas";
+
+let person1 = new Person();
+let person2 = new Person();
+
+person1.name = "Greg";
+console.log(person1.name);  // "Greg"，来自实例
+console.log(person2.name);  // "Nicholas"，来自原型
+
+person1.name = null;
+console.log(person1.name);  // null，来自实例
+
+delete person1.name
+console.log(person1.name);  // "Nicholas"，来自原型
+```
+
++ `hasOwnProperty()` 方法用于确定某个属性是在实例上还是在原型对象上，若**在实例上**会返回`true`
+
+```javascript
+function Person() {}
+
+Person.prototype.name = "Nicholas";
+
+let person1 = new Person();
+let person2 = new Person();
+
+person1.name = 'Greg'
+
+console.log(person1.hasOwnProperty('name')) // true
+console.log(person2.hasOwnProperty('name')) // false
+```
+
++ `in` 操作符会在可以通过对象访问指定属性时返回`true` ，**无论该属性是在实例上还是在原型上**。
+
+```javascript
+function Person() {}
+
+Person.prototype.name = "Nicholas";
+
+let person1 = new Person();
+
+console.log(person1.hasOwnProperty("name")); // false
+console.log("name" in person1); // true
+
+person1.name = "Greg";
+console.log(person1.name); // "Greg"，来自实例
+console.log(person1.hasOwnProperty("name")); // true
+console.log("name" in person1); // true
+```
+
++ `Object.values()` 返回对象值的数组，``Object.entries()`` 返回键/值对的数组。
+
+```javascript
+const o = {
+  foo: 'bar',
+  baz: 1,
+  qux: {}
+};
+
+console.log(Object.values(o));
+// ["bar", 1, {}]
+
+console.log(Object.entries((o)));
+// [["foo", "bar"], ["baz", 1], ["qux", {}]]
+```
+
+#### 其他原型语法
+
+```javascript
+function Person() {}
+
+Person.prototype.name = "Nicholas" // constructor 属性指向Person
+let friend1 = new Person();
+console.log(friend1.constructor == Person);  // true
+console.log(friend1.constructor == Object);  // false
+
+Person.prototype = {
+  name: "Nicholas", // constructor 属性指向该对象字面量创建的新对象
+};
+
+let friend2 = new Person();
+console.log(friend2.constructor == Person);  // false
+console.log(friend2.constructor == Object);  // true
+
+// 可以显式指回Person ，但这种方式会让Enumerable 为true
+Person.prototype = {
+  constructor: Person,
+  name: "Nicholas",
+};
+```
+
+#### 原型的问题
+
++ 它弱化了向构造函数传递初始化参数的能力，会导致所有实例默认都取得相同的属性值。
++ **原型的最主要问题源自它的共享特性**，看下面例子，实例数组属性`push` 入一个字符串，在两个实例间共享。
+
+```javascript
+function Person() {}
+
+Person.prototype = {
+  constructor: Person,
+  friends: ["Shelby", "Court"],
+};
+
+let person1 = new Person();
+let person2 = new Person();
+
+person1.friends.push("Van");
+
+console.log(person1.friends);  // "Shelby,Court,Van"
+console.log(person2.friends);  // "Shelby,Court,Van"
+console.log(person1.friends === person2.friends);  // true
 ```
 
 #### 闭包
